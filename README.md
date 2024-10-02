@@ -70,8 +70,3 @@ if (parsed != null) {
   }
 }
 ```
-
-## TODO
-
-- [x] Publish
-- [ ] Release to NPM
