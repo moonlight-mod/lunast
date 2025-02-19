@@ -123,17 +123,23 @@ export function getPropertyGetters(ast: Program) {
       for (const property of arg.properties) {
         if (!is.property(property)) continue;
         if (!is.identifier(property.key)) continue;
-        if (!is.functionExpression(property.value)) continue;
-        if (!is.blockStatement(property.value.body)) continue;
+        if (is.functionExpression(property.value)) {
+          if (!is.blockStatement(property.value.body)) continue;
 
-        const returnStatement = property.value.body.body.find(
-          (node): node is ReturnStatement => is.returnStatement(node)
-        );
-        if (!returnStatement || !returnStatement.argument) continue;
-        ret[property.key.name] = {
-          expression: returnStatement.argument,
-          scope: path.scope
-        };
+          const returnStatement = property.value.body.body.find(
+            (node): node is ReturnStatement => is.returnStatement(node)
+          );
+          if (!returnStatement || !returnStatement.argument) continue;
+          ret[property.key.name] = {
+            expression: returnStatement.argument,
+            scope: path.scope
+          };
+        } else if (is.arrowFunctionExpression(property.value)) {
+          ret[property.key.name] = {
+            expression: property.value,
+            scope: path.scope
+          };
+        }
       }
 
       this.stop();
